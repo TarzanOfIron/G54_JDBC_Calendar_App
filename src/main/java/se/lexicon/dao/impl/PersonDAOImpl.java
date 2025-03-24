@@ -19,14 +19,12 @@ public class PersonDAOImpl implements PersonDAO {
     public Person save(Person person) {
         Person personToReturn = null;
         String sql = "INSERT INTO person (name, email) VALUES (?,?)";
-        // todo: see if email already exists
+        // todo: see if email already exists sence it is unique in the DB
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            connection.setAutoCommit(false);
 
             statement.setString(1, person.getName());
             statement.setString(2, person.getEmail());
             statement.executeUpdate();
-            connection.commit();
 
             try (ResultSet generatedKey = statement.getGeneratedKeys()) {
                 if (generatedKey.next()) {
@@ -90,7 +88,7 @@ public class PersonDAOImpl implements PersonDAO {
             statement.setInt(1, id);
             if (statement.executeUpdate() == 1) {
                 System.out.println("Deleted Person Successfully");
-            } 
+            }
 
         } catch (SQLException e) {
             System.out.println("ERROR during delete person: " + e.getMessage());
