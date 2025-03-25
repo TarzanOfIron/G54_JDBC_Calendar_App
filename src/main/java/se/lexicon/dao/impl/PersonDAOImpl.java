@@ -17,7 +17,7 @@ public class PersonDAOImpl implements PersonDAO {
 
     @Override
     public Person save(Person person) {
-        Person personToReturn = null;
+        Person personToSave = null;
         String sql = "INSERT INTO person (name, email) VALUES (?,?)";
         // todo: see if email already exists sence it is unique in the DB
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -28,14 +28,14 @@ public class PersonDAOImpl implements PersonDAO {
 
             try (ResultSet generatedKey = statement.getGeneratedKeys()) {
                 if (generatedKey.next()) {
-                    personToReturn = findById(generatedKey.getInt(1)).orElse(null);
+                    personToSave = findById(generatedKey.getInt(1)).orElse(null);
                 }
             }
         } catch (SQLException e) {
             System.out.println("ERROR during saving person: " + e.getMessage());
             e.printStackTrace();
         }
-        return personToReturn;
+        return personToSave;
     }
 
     @Override

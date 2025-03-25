@@ -5,7 +5,6 @@ import se.lexicon.model.MyCalendar;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +19,7 @@ public class MyCalendarDAOImpl implements MyCalendarDAO {
 
     @Override
     public MyCalendar save(MyCalendar calendar) {
-        MyCalendar calendarToReturn = null;
+        MyCalendar calendarToSave = null;
         String sql = "INSERT INTO my_calendar (person_id, name, description) VALUES (?,?,?)";
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, calendar.getPerson_id());
@@ -30,14 +29,14 @@ public class MyCalendarDAOImpl implements MyCalendarDAO {
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    calendarToReturn = findById(generatedKeys.getInt(1)).get();
+                    calendarToSave = findById(generatedKeys.getInt(1)).get();
                 }
             }
         } catch (SQLException e) {
             System.out.println("ERROR during save my_calendar : " + e.getMessage());
             e.printStackTrace();
         }
-        return calendarToReturn;
+        return calendarToSave;
     }
 
     @Override
