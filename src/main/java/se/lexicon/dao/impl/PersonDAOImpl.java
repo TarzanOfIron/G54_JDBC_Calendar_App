@@ -1,10 +1,9 @@
 package se.lexicon.dao.impl;
 
 import se.lexicon.dao.PersonDAO;
-import se.lexicon.db.DatabaseManager;
+import se.lexicon.exception.EmailAlreadyExistsException;
 import se.lexicon.model.Person;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.Optional;
 
@@ -19,19 +18,22 @@ public class PersonDAOImpl implements PersonDAO {
     public Person save(Person person) {
         Person personToSave = null;
         String sql = "INSERT INTO person (name, email) VALUES (?,?)";
-        // todo: see if email already exists sence it is unique in the DB
-        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try {
+            emailAvailable(person.getEmail());
+            try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            statement.setString(1, person.getName());
-            statement.setString(2, person.getEmail());
-            statement.executeUpdate();
+                statement.setString(1, person.getName());
+                statement.setString(2, person.getEmail());
+                statement.executeUpdate();
 
-            try (ResultSet generatedKey = statement.getGeneratedKeys()) {
-                if (generatedKey.next()) {
-                    personToSave = findById(generatedKey.getInt(1)).orElse(null);
+                try (ResultSet generatedKey = statement.getGeneratedKeys()) {
+                    if (generatedKey.next()) {
+                        personToSave = findById(generatedKey.getInt(1)).orElse(null);
+                    }
                 }
+
             }
-        } catch (SQLException e) {
+        } catch (SQLException | EmailAlreadyExistsException e) {
             System.out.println("ERROR during saving person: " + e.getMessage());
             e.printStackTrace();
         }
@@ -84,7 +86,7 @@ public class PersonDAOImpl implements PersonDAO {
     public void delete(int id) {
         String sql = "DELETE FROM person WHERE id = ?";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)){
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, id);
             if (statement.executeUpdate() == 1) {
                 System.out.println("Deleted Person Successfully");
@@ -96,6 +98,20 @@ public class PersonDAOImpl implements PersonDAO {
         }
 
     }
-    // TODO: Needs completion
+
+    private boolean emailAvailable(String email) throws EmailAlreadyExistsException, SQLException{
+        String sql = "SELECT * FROM person WHERE email = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, email);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    System.out.println("there are no emails like this yet");
+                    return true;
+                }
+            }
+        }
+        throw new EmailAlreadyExistsException("Provided email already taken.");
+    }
 
 }

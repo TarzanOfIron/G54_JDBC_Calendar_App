@@ -20,9 +20,9 @@ public class Main {
 
             // Person
 
-            Person testPerson = new Person("Botond", "email");
+            Person testPerson = new Person("Botond", "emailss");
             Person testPerson2 = new Person("Botond", "email2");
-            //System.out.println(personDAO.save(testPerson));
+            System.out.println(personDAO.save(testPerson));
             //System.out.println(personDAO.save(testPerson2));
             //System.out.println(personDAO.findById(1));
             //personDAO.update(new Person(1, "aaa", "aaaemail"));
@@ -47,7 +47,7 @@ public class Main {
             Event myFirstEvent = new Event(1,1, "Updated title", "Shits gonna go down", LocalDateTime.now().plusMonths(2));
             //System.out.println(eventDAO.save(myFirstEvent));
             //eventDAO.findAllByCalendarId(1).forEach(System.out::println);
-            eventDAO.delete(myFirstEvent.getId());
+           // eventDAO.delete(myFirstEvent.getId());
 
 
 
