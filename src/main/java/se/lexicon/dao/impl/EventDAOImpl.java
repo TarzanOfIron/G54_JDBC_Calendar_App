@@ -20,10 +20,13 @@ public class EventDAOImpl implements EventDAO {
         String sql = "INSERT INTO event (calendar_id, title, description, date_time) VALUES (?,?,?,?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             statement.setInt(1, event.getCalendar_id());
             statement.setString(2, event.getTitle());
             statement.setString(3, event.getDescription());
             statement.setDate(4, java.sql.Date.valueOf(event.getDateTime().toLocalDate()));
+            // Participants Collection to the event_participants table
+
             statement.executeUpdate();
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -31,6 +34,7 @@ public class EventDAOImpl implements EventDAO {
 
                     eventToSave = event;
                     eventToSave.setId(generatedKeys.getInt(1));
+                    addParticipants(event.getParticipants(), eventToSave.getId());
                 }
             }
 
@@ -77,9 +81,12 @@ public class EventDAOImpl implements EventDAO {
             statement.setDate(4, java.sql.Date.valueOf(event.getDateTime().toLocalDate()));
             statement.setInt(5, event.getId());
 
+
             if (statement.executeUpdate() == 1) {
                 System.out.println("Updated Event Successfully");
+                addParticipants(event.getParticipants(), event.getId());
             }
+
         } catch (SQLException e) {
             System.out.println("ERROR during updating event: " + e.getMessage());
             e.printStackTrace();
@@ -102,5 +109,29 @@ public class EventDAOImpl implements EventDAO {
             e.printStackTrace();
         }
 
+    }
+
+    private void deleteParticipants(int eventId) {
+        String sql = "Delete FROM event_participants WHERE event_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, eventId);
+            statement.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void addParticipants(ArrayList<String> participants, int eventId) {
+        deleteParticipants(eventId);
+        String sql = "INSERT INTO event_participants (event_id, email) VALUES (?,?)";
+        for (String email : participants) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, eventId);
+                statement.setString(2, email);
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

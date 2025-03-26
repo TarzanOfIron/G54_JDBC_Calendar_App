@@ -1,6 +1,7 @@
 package se.lexicon.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Event {
@@ -9,6 +10,7 @@ public class Event {
     private String title;
     private String description;
     private LocalDateTime dateTime;
+    private ArrayList<String> participants = new ArrayList<>();
 
 
     // Constructor
@@ -46,6 +48,10 @@ public class Event {
         return dateTime;
     }
 
+    public ArrayList<String> getParticipants() {
+        return participants;
+    }
+
     // Setters
 
     public void setId(int id) {
@@ -70,6 +76,10 @@ public class Event {
     public void setDateTime(LocalDateTime dateTime) {
         Objects.requireNonNull(dateTime);
         this.dateTime = dateTime;
+    }
+
+    public void addParticipantEmail(String email) {
+        participants.add(email);
     }
 
     @Override

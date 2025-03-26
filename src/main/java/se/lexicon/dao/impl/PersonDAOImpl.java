@@ -99,15 +99,14 @@ public class PersonDAOImpl implements PersonDAO {
 
     }
 
-    private boolean emailAvailable(String email) throws EmailAlreadyExistsException, SQLException{
+    private void emailAvailable(String email) throws EmailAlreadyExistsException, SQLException{
         String sql = "SELECT * FROM person WHERE email = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
-                    System.out.println("there are no emails like this yet");
-                    return true;
+                    return;
                 }
             }
         }

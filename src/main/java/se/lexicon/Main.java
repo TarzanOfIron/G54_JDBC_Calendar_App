@@ -17,12 +17,14 @@ public class Main {
 
         try (Connection connection = DatabaseManager.getConnection()) {
             PersonDAOImpl personDAO = new PersonDAOImpl(connection);
+            MyCalendarDAOImpl myCalendarDAO = new MyCalendarDAOImpl(connection);
+            EventDAOImpl eventDAO = new EventDAOImpl(connection);
 
             // Person
 
             Person testPerson = new Person("Botond", "emailss");
             Person testPerson2 = new Person("Botond", "email2");
-            System.out.println(personDAO.save(testPerson));
+            //System.out.println(personDAO.save(testPerson));
             //System.out.println(personDAO.save(testPerson2));
             //System.out.println(personDAO.findById(1));
             //personDAO.update(new Person(1, "aaa", "aaaemail"));
@@ -32,7 +34,6 @@ public class Main {
 
 
             // My calendar
-            MyCalendarDAOImpl myCalendarDAO = new MyCalendarDAOImpl(connection);
             MyCalendar myCalendar = new MyCalendar(1,"My First Calendar", "This is a test :)");
             //System.out.println(myCalendarDAO.save(myCalendar));
             //System.out.println(myCalendarDAO.save(myCalendar));
@@ -43,11 +44,12 @@ public class Main {
             //myCalendarDAO.delete(1);
 
             // Event
-            EventDAOImpl eventDAO = new EventDAOImpl(connection);
-            Event myFirstEvent = new Event(1,1, "Updated title", "Shits gonna go down", LocalDateTime.now().plusMonths(2));
-            //System.out.println(eventDAO.save(myFirstEvent));
+            Event myFirstEvent = new Event(1, "Updated title", "Shits gonna go down", LocalDateTime.now().plusMonths(2));
+            myFirstEvent.addParticipantEmail("emailss");
+
+            eventDAO.save(myFirstEvent);
             //eventDAO.findAllByCalendarId(1).forEach(System.out::println);
-           // eventDAO.delete(myFirstEvent.getId());
+            //eventDAO.delete(myFirstEvent.getId());
 
 
 
